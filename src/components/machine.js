@@ -1,27 +1,45 @@
 import React, { useEffect, useState, useReducer, useRef } from 'react';
+import { act } from 'react-dom/cjs/react-dom-test-utils.production.min';
 const Vending = () => {
   const API_URL = 'https://vending-machine-test.vercel.app/api/products';
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
-  const getProdducts = async () => {
-    try {
-      const res = await fetch(API_URL);
-      const obj = await res.json();
-      console.log(obj);
-      console.log(obj.data);
-      setProducts(obj.data);
-      setTotalProducts(products.length);
-      console.log(totalProducts);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 2500);
-    } catch (error) {
-      throw Error(error);
+  const [numberSelected, setNumberSelected] = useState([]);
+
+  const defaultState = {
+    products: [],
+    isLoading: true,
+    totalProducts: 0,
+    numberSelected: [],
+  };
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case 'ADD_ITEM':
+        const new_numbers = [...state, action.payload];
+        console.warn(new_numbers);
+        return { ...state, numberSelected: new_numbers };
+      case 'GET_PRODUCTS_LOADING':
+        return { ...state, isLoading: true };
+      case 'GET_PRODUCTS_SUCCESS':
+        return { ...state, products: action.payload, isLoading: false };
+      default:
+        return state;
     }
   };
+  const [state, dispatch] = useReducer(reducer, defaultState);
+
   useEffect(() => {
-    getProdducts();
+    dispatch({ type: 'GET_PRODUCTS_LOADING' });
+
+    fetch(API_URL)
+      .then((response) => {
+        return response.json();
+      })
+      .then((info) => {
+        console.error(info.data);
+        dispatch({ type: 'GET_PRODUCTS_SUCCESS', payload: info.data });
+      });
   }, []);
   return (
     <React.Fragment>
@@ -30,10 +48,10 @@ const Vending = () => {
         <div className="row">
           <div id="col-container" className=" col-md-8 border ">
             <div className="text-center d-flex justify-content-center flex-wrap ">
-              {isLoading ? (
+              {state.isLoading ? (
                 <LoadingComponent></LoadingComponent>
               ) : (
-                products.map((product) => {
+                state.products.map((product) => {
                   return (
                     <ShowProducts
                       key={product.id}
@@ -50,11 +68,21 @@ const Vending = () => {
             </h2>
             <div id="wrapper-menu">
               <ul className="panels-menu d-flex justify-content-center flex-wrap">
-                {products.map((product, index) => {
+                {state.products.map((product, index) => {
                   return (
                     <li key={product.id} className="col-md-4">
                       <div className="foor-number"></div>
-                      <p className="btn btn-secondary">{index + 1}</p>
+                      <p
+                        className="btn btn-secondary"
+                        onClick={(e) => {
+                          dispatch({
+                            type: 'ADD_ITEM',
+                            payload: e.target.value,
+                          });
+                        }}
+                      >
+                        {index + 1}
+                      </p>
                     </li>
                   );
                 })}
