@@ -6,18 +6,40 @@ const Vending = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
   const [numberSelected, setNumberSelected] = useState([]);
-
+  const selectionRef = useRef();
   const defaultState = {
     products: [],
     isLoading: true,
     totalProducts: 0,
     numberSelected: [],
+    optionClass: 'btn btn-secondary',
   };
   const reducer = (state, action) => {
     switch (action.type) {
       case 'ADD_ITEM':
-        const new_numbers = [...state, action.payload];
-        console.warn(new_numbers);
+        const new_numbers = [
+          ...state.numberSelected,
+          action.payload.target.innerHTML,
+        ];
+
+        const $numberElement = action.payload.target;
+
+        if ($numberElement.classList.contains('selected-item')) {
+          let newArr = new_numbers.filter(
+            (number) => number !== action.payload.target.innerHTML
+          );
+        } else {
+          $numberElement.classList.add('selected-item');
+        }
+        console.log(new_numbers);
+
+        /*if (foodSelected.classList.contains('selected-item')) {
+          foodSelected.classList.remove('selected-item');
+          
+        } else {
+          foodSelected.classList.add('selected-item');
+          //itemsSelected.push(currentValue)
+        }*/
         return { ...state, numberSelected: new_numbers };
       case 'GET_PRODUCTS_LOADING':
         return { ...state, isLoading: true };
@@ -37,7 +59,7 @@ const Vending = () => {
         return response.json();
       })
       .then((info) => {
-        console.error(info.data);
+        console.log(info.data);
         dispatch({ type: 'GET_PRODUCTS_SUCCESS', payload: info.data });
       });
   }, []);
@@ -73,11 +95,12 @@ const Vending = () => {
                     <li key={product.id} className="col-md-4">
                       <div className="foor-number"></div>
                       <p
-                        className="btn btn-secondary"
+                        className={state.optionClass}
                         onClick={(e) => {
+                          console.log(e.target);
                           dispatch({
                             type: 'ADD_ITEM',
-                            payload: e.target.value,
+                            payload: e,
                           });
                         }}
                       >
