@@ -167,7 +167,7 @@ h1 {
 }
 
 .btn-number {
-  margin: 5px;
+  margin: 5 px;
   background-color: #7ee8fa;
 }
 .reiniciar {
@@ -180,8 +180,7 @@ h1 {
   width: 20px;
   right: 26%;
   font-size: 20px;
-  color: #fff;
-  opacity: 1;
+  color: #333;
 }
 .titulo-pro {
   position: absolute;

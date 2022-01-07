@@ -1,12 +1,27 @@
 import React, { useEffect, useState, useReducer, useRef } from 'react';
-import { act } from 'react-dom/cjs/react-dom-test-utils.production.min';
+
+function playCountDown(counterValue) {}
+
+function timeout(ms) {
+  //  $resultadosContainer.classList.remove("set-opacity")
+
+  return new Promise((resolve) =>
+    setTimeout(() => {
+      resolve();
+    }, ms)
+  );
+}
+
 const Vending = () => {
   const API_URL = 'https://vending-machine-test.vercel.app/api/products';
-  const [products, setProducts] = useState([]);
+  /*const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
   const [numberSelected, setNumberSelected] = useState([]);
+  */
+
   const selectionRef = useRef();
+
   const defaultState = {
     products: [],
     isLoading: true,
@@ -29,7 +44,6 @@ const Vending = () => {
             ...state.numberSelected,
             action.payload.target.innerHTML,
           ];
-          console.log(new_numbers);
           return { ...state, numberSelected: new_numbers };
         }
         return state;
@@ -38,6 +52,37 @@ const Vending = () => {
         return { ...state, isLoading: true };
       case 'GET_PRODUCTS_SUCCESS':
         return { ...state, products: action.payload, isLoading: false };
+      case 'SHOW_ITEMS':
+        (async () => {
+          for (let index = 0; index < state.products.length; index++) {
+            state.numberSelected.sort();
+            console.log('retornandop');
+            for (
+              let index2 = 0;
+              index2 < state.numberSelected.length;
+              index2++
+            ) {
+              if (index == state.numberSelected[index2]) {
+                index += 1;
+                console.log('EQUAL NUMBERS' + state.numberSelected[index2]);
+                const delay = index * 1000;
+                let counterValue = delay / 1000;
+                /*console.log('delay' + delay);
+                console.log('counter' + counterValue);*/
+
+                const countDown = setInterval(() => {
+                  counterValue--;
+                  const $counter = document.getElementById('counter');
+                  $counter.textContent = `${counterValue}`;
+                }, 1000);
+                await timeout(delay);
+
+                clearInterval(countDown);
+              }
+            }
+          }
+        })();
+        return state;
       default:
         return state;
     }
@@ -46,15 +91,15 @@ const Vending = () => {
 
   useEffect(() => {
     dispatch({ type: 'GET_PRODUCTS_LOADING' });
-
-    fetch(API_URL)
-      .then((response) => {
-        return response.json();
-      })
-      .then((info) => {
-        console.log(info.data);
-        dispatch({ type: 'GET_PRODUCTS_SUCCESS', payload: info.data });
-      });
+    setTimeout(() => {
+      fetch(API_URL)
+        .then((response) => {
+          return response.json();
+        })
+        .then((info) => {
+          dispatch({ type: 'GET_PRODUCTS_SUCCESS', payload: info.data });
+        });
+    }, 2500);
   }, []);
   return (
     <React.Fragment>
@@ -90,7 +135,6 @@ const Vending = () => {
                       <p
                         className={state.optionClass}
                         onClick={(e) => {
-                          console.log(e.target);
                           dispatch({
                             type: 'ADD_ITEM',
                             payload: e,
@@ -104,7 +148,13 @@ const Vending = () => {
                 })}
               </ul>
               <div id="botones-container">
-                <button id="comprar" className="btn btn-success">
+                <button
+                  id="comprar"
+                  className="btn btn-success"
+                  onClick={() => {
+                    dispatch({ type: 'SHOW_ITEMS' });
+                  }}
+                >
                   Comprar
                 </button>
                 <button id="reiniciar" className="btn btn-danger">
@@ -117,7 +167,9 @@ const Vending = () => {
             </div>
             <div id="resultados-container"></div>
             <div>
-              <p id="counter" align="center"></p>
+              <p id="counter" align="center">
+                0
+              </p>
             </div>
 
             <div id="spinner" className="lds-dual-ring"></div>
