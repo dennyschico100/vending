@@ -12,35 +12,28 @@ const Vending = () => {
     isLoading: true,
     totalProducts: 0,
     numberSelected: [],
-    optionClass: 'btn btn-secondary',
+
+    optionClass: 'btn-number',
   };
   const reducer = (state, action) => {
     switch (action.type) {
       case 'ADD_ITEM':
-        const new_numbers = [
-          ...state.numberSelected,
-          action.payload.target.innerHTML,
-        ];
-
         const $numberElement = action.payload.target;
+        const current_class = $numberElement.classList.value;
 
-        if ($numberElement.classList.contains('selected-item')) {
-          let newArr = new_numbers.filter(
-            (number) => number !== action.payload.target.innerHTML
-          );
-        } else {
+        if (!current_class.includes('selected-item')) {
           $numberElement.classList.add('selected-item');
         }
-        console.log(new_numbers);
+        if (!state.numberSelected.includes(action.payload.target.innerHTML)) {
+          let new_numbers = [
+            ...state.numberSelected,
+            action.payload.target.innerHTML,
+          ];
+          console.log(new_numbers);
+          return { ...state, numberSelected: new_numbers };
+        }
+        return state;
 
-        /*if (foodSelected.classList.contains('selected-item')) {
-          foodSelected.classList.remove('selected-item');
-          
-        } else {
-          foodSelected.classList.add('selected-item');
-          //itemsSelected.push(currentValue)
-        }*/
-        return { ...state, numberSelected: new_numbers };
       case 'GET_PRODUCTS_LOADING':
         return { ...state, isLoading: true };
       case 'GET_PRODUCTS_SUCCESS':

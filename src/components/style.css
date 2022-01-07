@@ -166,7 +166,9 @@ h1 {
   justify-content: space-between;
 }
 
-.btn {
+.btn-number {
+  margin: 5px;
+  background-color: #7ee8fa;
 }
 .reiniciar {
   background-color: #e63946;
