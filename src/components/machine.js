@@ -11,6 +11,13 @@ function timeout(ms) {
     }, ms)
   );
 }
+const mostrarResultados = async (name) => {
+  const $resultadosContainer = document.getElementById('resultados-container');
+  const $div = document.createElement('div');
+  $div.classList.add('contenedor-imagenes');
+  $div.innerHTML = `<img class="img-resultado"  src="${name}" alt="${name}" /> `;
+  $resultadosContainer.appendChild($div);
+};
 
 const Vending = () => {
   const API_URL = 'https://vending-machine-test.vercel.app/api/products';
@@ -54,28 +61,70 @@ const Vending = () => {
         return { ...state, products: action.payload, isLoading: false };
       case 'SHOW_ITEMS':
         (async () => {
+          let arr_differences = [];
           for (let index = 0; index < state.products.length; index++) {
             state.numberSelected.sort();
-            console.log('retornandop');
+            //console.log('retornando ' + index);
             for (
-              let index2 = 0;
-              index2 < state.numberSelected.length;
-              index2++
+              let numbers_index = 0;
+              numbers_index < state.numberSelected.length;
+              numbers_index++
             ) {
-              if (index == state.numberSelected[index2]) {
+              if (index == state.numberSelected[numbers_index]) {
+                //siguiente numero
+                let next_number_selected = '';
+                //let res = state.numberSelected.(numbers_index + 1);
+
+                if (!numbers_index + 1 === state.numberSelected.length) {
+                  next_number_selected =
+                    state.numberSelected[numbers_index + 1];
+                }
+
+                const current_number_selected =
+                  state.numberSelected[numbers_index];
+                let time_difference = 0;
+
+                if (!!next_number_selected) {
+                  time_difference =
+                    next_number_selected - current_number_selected;
+                  arr_differences.push(time_difference);
+                }
+                console.error(time_difference);
+
                 index += 1;
-                console.log('EQUAL NUMBERS' + state.numberSelected[index2]);
-                const delay = index * 1000;
+
+                console.log(
+                  'EQUAL NUMBERS' + state.numberSelected[numbers_index]
+                );
+                let delay = index * 1000;
+
+                if (numbers_index !== 0) {
+                  //debo de usar la resta que queda en la iteracion anterior no en esta , por es falla
+                  const current_difference = arr_differences.at(-1);
+                  delay = current_difference * 1000;
+                  delay += 1000;
+                }
+                console.error(delay);
                 let counterValue = delay / 1000;
-                /*console.log('delay' + delay);
-                console.log('counter' + counterValue);*/
+
+                /*alert(
+                  'DIFFERENCE ' +
+                    next_number_selected +
+                    '' +
+                    current_number_selected
+                );
+                alert('DELAY ' + delay);
+                alert('counter ' + counterValue);*/
 
                 const countDown = setInterval(() => {
+                  console.log(counterValue);
                   counterValue--;
+
                   const $counter = document.getElementById('counter');
                   $counter.textContent = `${counterValue}`;
                 }, 1000);
                 await timeout(delay);
+                mostrarResultados(state.products[numbers_index]['thumbnail']);
 
                 clearInterval(countDown);
               }

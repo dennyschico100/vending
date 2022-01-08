@@ -168,6 +168,9 @@ h1 {
 
 .btn-number {
   margin: 5 px;
+  text-align: center;
+  display: inline-block;
+  width: 50px;
   background-color: #7ee8fa;
 }
 .reiniciar {
