@@ -25,6 +25,7 @@ const mostrarResultados = async (name) => {
 const Vending = () => {
   const API_URL = 'https://vending-machine-test.vercel.app/api/products';
   const resultadosContainerRef = useRef('');
+  const numberListRef = useRef('');
 
   /*const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +57,12 @@ const Vending = () => {
             ...state.numberSelected,
             action.payload.target.innerHTML,
           ];
-          return { ...state, numberSelected: new_numbers };
+          //numberListRef.current.firstChild.classList.add('selected-item');
+          return {
+            ...state,
+            numberSelected: new_numbers,
+            optionClass: 'btn-number',
+          };
         }
         return state;
 
@@ -67,9 +73,11 @@ const Vending = () => {
       case 'SHOW_ITEMS':
         (async () => {
           let arr_differences = [];
+          console.log(state.numberSelected);
+
           for (let index = 0; index < state.products.length; index++) {
             state.numberSelected.sort();
-            //console.log('retornando ' + index);
+
             for (
               let numbers_index = 0;
               numbers_index < state.numberSelected.length;
@@ -78,19 +86,13 @@ const Vending = () => {
               if (index == state.numberSelected[numbers_index]) {
                 //siguiente numero
                 let next_number_selected;
-                //let res = state.numberSelected.(numbers_index + 1);
-                console.log('NEXT NUMBER BEDORE IF ' + next_number_selected);
-                console.warn(numbers_index);
 
                 if (!(numbers_index === state.numberSelected.length)) {
                   next_number_selected =
                     state.numberSelected[numbers_index + 1];
 
-                  console.log('NEXT NUMBER INSIDE IF ' + next_number_selected);
                   console.log(numbers_index);
                 }
-                console.warn(numbers_index);
-                console.log('NEXT NUMBER AFTER IF ' + next_number_selected);
 
                 const current_number_selected =
                   state.numberSelected[numbers_index];
@@ -115,7 +117,7 @@ const Vending = () => {
                   delay = current_difference * 1000;
                   //delay += 1000;
                 }
-                console.error(delay);
+
                 let counterValue = delay / 1000;
 
                 /*alert(
@@ -131,10 +133,7 @@ const Vending = () => {
                   resultadosContainerRef.current.style.backgroundImage =
                     "url('https://t4.ftcdn.net/jpg/03/25/66/07/360_F_325660785_l8Dyf74gRfIeZFaaZgFQgxmMpiEtDQ4o.jpg')";
 
-                  console.log(counterValue);
                   counterValue--;
-
-                  const $counter = document.getElementById('counter');
                 }, 1000);
 
                 await timeout(delay);
@@ -151,7 +150,30 @@ const Vending = () => {
             }
           }
         })();
-        return state;
+        return { ...state };
+
+      case 'REMOVE_ITEMS':
+        console.log(numberListRef);
+        //numberListRef.current.classList
+        const $optionMenu = document.querySelectorAll('.btn-number');
+
+        $optionMenu.forEach((foodSelected) => {
+          if (foodSelected.classList.contains('selected-item')) {
+            foodSelected.classList.remove('selected-item');
+          }
+        });
+
+        let $resultadosContainer = document.getElementById(
+          'resultados-container'
+        );
+
+        while ($resultadosContainer.firstChild) {
+          $resultadosContainer.removeChild($resultadosContainer.firstChild);
+        }
+        return {
+          ...state,
+          numberSelected: [],
+        };
       default:
         return state;
     }
@@ -180,11 +202,12 @@ const Vending = () => {
               {state.isLoading ? (
                 <LoadingComponent></LoadingComponent>
               ) : (
-                state.products.map((product) => {
+                state.products.map((product, index) => {
                   return (
                     <ShowProducts
                       key={product.id}
                       product={product}
+                      index={(index += 1)}
                     ></ShowProducts>
                   );
                 })
@@ -202,7 +225,8 @@ const Vending = () => {
                     <li key={product.id} className="col-md-4">
                       <div className="foor-number"></div>
                       <p
-                        className={state.optionClass}
+                        ref={numberListRef}
+                        className="btn-number"
                         onClick={(e) => {
                           dispatch({
                             type: 'ADD_ITEM',
@@ -226,8 +250,14 @@ const Vending = () => {
                 >
                   Comprar
                 </button>
-                <button id="reiniciar" className="btn btn-danger">
-                  Reiniciar
+                <button
+                  id="reiniciar"
+                  className="btn btn-danger"
+                  onClick={() => {
+                    dispatch({ type: 'REMOVE_ITEMS' });
+                  }}
+                >
+                  Limpiar Seleccion
                 </button>
               </div>
               <h3 className="msg-error-show" id="msg-error">
@@ -248,6 +278,7 @@ const Vending = () => {
 };
 const ShowProducts = (props) => {
   const { id, thumbnail, preparation_time } = props.product;
+
   return (
     <ul className="col-md-4 list-unstyled  card-header text-center">
       <li className="card card-body">
@@ -256,7 +287,7 @@ const ShowProducts = (props) => {
       </li>
       <li className="card card-body">
         <strong>TIEMPO: </strong>
-        {preparation_time}
+        {props.index}
       </li>
     </ul>
   );
