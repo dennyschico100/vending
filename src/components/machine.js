@@ -11,16 +11,21 @@ function timeout(ms) {
     }, ms)
   );
 }
+let $resultadosContainer = document.getElementById('resultados-container');
+
 const mostrarResultados = async (name) => {
-  const $resultadosContainer = document.getElementById('resultados-container');
+  let $resultadosContainer_ = document.getElementById('resultados-container');
+
   const $div = document.createElement('div');
   $div.classList.add('contenedor-imagenes');
   $div.innerHTML = `<img class="img-resultado"  src="${name}" alt="${name}" /> `;
-  $resultadosContainer.appendChild($div);
+  $resultadosContainer_.appendChild($div);
 };
 
 const Vending = () => {
   const API_URL = 'https://vending-machine-test.vercel.app/api/products';
+  const resultadosContainerRef = useRef('');
+
   /*const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -98,7 +103,7 @@ const Vending = () => {
                 }
                 console.error(time_difference);
 
-                index += 1;
+                //index += 1;
 
                 console.log(
                   'EQUAL NUMBERS' + state.numberSelected[numbers_index]
@@ -108,7 +113,7 @@ const Vending = () => {
                 if (numbers_index !== 0) {
                   const current_difference = arr_differences.at(-1);
                   delay = current_difference * 1000;
-                  delay += 1000;
+                  //delay += 1000;
                 }
                 console.error(delay);
                 let counterValue = delay / 1000;
@@ -123,14 +128,23 @@ const Vending = () => {
                 alert('counter ' + counterValue);*/
 
                 const countDown = setInterval(() => {
+                  resultadosContainerRef.current.style.backgroundImage =
+                    "url('https://t4.ftcdn.net/jpg/03/25/66/07/360_F_325660785_l8Dyf74gRfIeZFaaZgFQgxmMpiEtDQ4o.jpg')";
+
                   console.log(counterValue);
                   counterValue--;
 
                   const $counter = document.getElementById('counter');
-                  $counter.textContent = `${counterValue}`;
                 }, 1000);
+
                 await timeout(delay);
-                mostrarResultados(state.products[numbers_index]['thumbnail']);
+
+                let index_search = 0;
+                index_search = index;
+                index_search--;
+                resultadosContainerRef.current.style.backgroundImage = '';
+
+                mostrarResultados(state.products[index_search]['thumbnail']);
 
                 clearInterval(countDown);
               }
@@ -220,11 +234,9 @@ const Vending = () => {
                 Seleccionr una opcion
               </h3>
             </div>
-            <div id="resultados-container"></div>
+            <div id="resultados-container" ref={resultadosContainerRef}></div>
             <div>
-              <p id="counter" align="center">
-                0
-              </p>
+              <p id="counter" align="center"></p>
             </div>
 
             <div id="spinner" className="lds-dual-ring"></div>
