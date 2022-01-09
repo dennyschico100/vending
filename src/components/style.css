@@ -132,6 +132,7 @@ h1 {
 }
 
 .selected-item {
+  border: 3px solid yellow;
 }
 
 .img-fluid:hover {
