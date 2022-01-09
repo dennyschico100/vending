@@ -72,13 +72,20 @@ const Vending = () => {
             ) {
               if (index == state.numberSelected[numbers_index]) {
                 //siguiente numero
-                let next_number_selected = '';
+                let next_number_selected;
                 //let res = state.numberSelected.(numbers_index + 1);
+                console.log('NEXT NUMBER BEDORE IF ' + next_number_selected);
+                console.warn(numbers_index);
 
-                if (!numbers_index + 1 === state.numberSelected.length) {
+                if (!(numbers_index === state.numberSelected.length)) {
                   next_number_selected =
                     state.numberSelected[numbers_index + 1];
+
+                  console.log('NEXT NUMBER INSIDE IF ' + next_number_selected);
+                  console.log(numbers_index);
                 }
+                console.warn(numbers_index);
+                console.log('NEXT NUMBER AFTER IF ' + next_number_selected);
 
                 const current_number_selected =
                   state.numberSelected[numbers_index];
@@ -99,7 +106,6 @@ const Vending = () => {
                 let delay = index * 1000;
 
                 if (numbers_index !== 0) {
-                  //debo de usar la resta que queda en la iteracion anterior no en esta , por es falla
                   const current_difference = arr_differences.at(-1);
                   delay = current_difference * 1000;
                   delay += 1000;
